@@ -4,16 +4,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_menu1"
-            android:icon="@mipmap/ic_launcher"
-            android:title="Menu 1" />
+            android:icon="@drawable/androidos"
+            android:title="SYSTEM" />
         <item
             android:id="@+id/nav_menu2"
-            android:icon="@mipmap/ic_launcher"
-            android:title="Menu 2" />
+            android:icon="@drawable/processor"
+            android:title="SOC" />
         <item
             android:id="@+id/nav_menu3"
-            android:icon="@mipmap/ic_launcher"
-            android:title="Menu 3" />
+            android:icon="@drawable/device"
+            android:title="DEVICE" />
 
     </group>
 

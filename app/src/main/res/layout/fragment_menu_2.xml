@@ -1,15 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Menu 2"
-        android:id="@+id/textView"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:text="SOC"
+        android:layout_gravity="center_horizontal"
+        android:textAllCaps="true"
+        android:textSize="25sp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:fontFamily="@font/aref_ruqaa"/>
 
-</RelativeLayout>
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layout_marginStart="10dp"
+       android:layout_marginEnd="10dp"
+       android:orientation="vertical">
+
+       <TextView
+           android:id="@+id/avil_pro_text_view"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="#000000"
+           android:textSize="20sp"
+           android:text="Available processors:"
+           android:textAllCaps="false" />
+       <TextView
+           android:id="@+id/architecture_text_view"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Architecture"
+           android:layout_marginTop="5dp"
+           android:textColor="#000000"
+           android:textSize="20sp"
+           android:textAllCaps="false" />
+       <TextView
+           android:id="@+id/cpufreq_text_view"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Freqency"
+           android:layout_marginTop="5dp"
+           android:textColor="#000000"
+           android:textSize="20sp"
+           android:textAllCaps="false" />
+   </LinearLayout>
+
+
+</android.support.v7.widget.LinearLayoutCompat>
