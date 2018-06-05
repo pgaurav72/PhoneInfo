@@ -67,7 +67,38 @@
             android:textColor="#000000"
             android:textSize="20sp"
             android:textAllCaps="false"/>
-
+        <TextView
+            android:id="@+id/avail_internal_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avilable Internal"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
+        <TextView
+            android:id="@+id/total_internal_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total Internal"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
+        <TextView
+            android:id="@+id/avail_external_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avilable External"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
+        <TextView
+            android:id="@+id/total_external_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total External"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
 
     </LinearLayout>
 

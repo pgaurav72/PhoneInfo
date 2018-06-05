@@ -5,6 +5,8 @@ import android.app.ActivityManager;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -16,11 +18,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 import static android.content.Context.ACTIVITY_SERVICE;
+import static android.provider.Telephony.ThreadsColumns.ERROR;
 
 
 /**
@@ -29,7 +33,7 @@ import static android.content.Context.ACTIVITY_SERVICE;
 public class Menu3 extends Fragment {
 
   private TextView modelNameTextView, brandNameTextView, screenSizeTextView, screenResolutionTextView, screenDensityTextView,
-  totalRAMTextView, avilRAMTextView;
+  totalRAMTextView, avilRAMTextView, availInternalTextView, availExternalTextView, totalInternalTextView, totalExternalTextView;
 
   @Nullable
   @Override
@@ -42,6 +46,10 @@ public class Menu3 extends Fragment {
     screenDensityTextView = view.findViewById(R.id.density_text_view);
     totalRAMTextView = view.findViewById(R.id.total_ram_text_view);
     avilRAMTextView = view.findViewById(R.id.avail_ram_text_view);
+    availInternalTextView = view.findViewById(R.id.avail_internal_text_view);
+    availExternalTextView = view.findViewById(R.id.avail_external_text_view);
+    totalInternalTextView = view.findViewById(R.id.total_internal_text_view);
+    totalExternalTextView = view.findViewById(R.id.total_external_text_view);
     modelNameTextView.setText("Model Name: "+ Build.MODEL);
     brandNameTextView.setText("Brand Name: "+Build.MANUFACTURER);
     String screenSize = getScreenSize();
@@ -49,12 +57,112 @@ public class Menu3 extends Fragment {
     screenResolution();
     screenDensity();
     long totalRAM = totalRAM();
-    totalRAMTextView.setText("Total RAM: "+String.valueOf(totalRAM()));
-    avilRAMTextView.setText("Available RAM: "+Runtime.getRuntime().freeMemory());
+    String RAM = humanReadableByteCount(totalRAM,true);
+    long avilableRAM = avilableRAM();
+    totalRAMTextView.setText("Total RAM: "+RAM);
+    avilRAMTextView.setText("Available RAM: "+String.valueOf(avilableRAM)+" MB");
+    availInternalTextView.setText("Available Internal: "+getAvailableInternalMemorySize());
+    availExternalTextView.setText("Available External: "+getAvailableExternalMemorySize());
+    totalInternalTextView.setText("Total Internal: "+getTotalInternalMemorySize());
+    totalExternalTextView.setText("Total External "+getTotalExternalMemorySize());
     return view;
   }
 
-  public long totalRAM(){
+
+  public static boolean externalMemoryAvailable() {
+    return android.os.Environment.getExternalStorageState().equals(
+            android.os.Environment.MEDIA_MOUNTED);
+  }
+
+  public static String getTotalExternalMemorySize() {
+    if (externalMemoryAvailable()) {
+      File path = Environment.getExternalStorageDirectory();
+      StatFs stat = new StatFs(path.getPath());
+      long blockSize = stat.getBlockSizeLong();
+      long totalBlocks = stat.getBlockCountLong();
+      return formatSize(totalBlocks * blockSize);
+    } else {
+      return ERROR;
+    }
+  }
+
+  public static String getAvailableExternalMemorySize() {
+    if (externalMemoryAvailable()) {
+      File path = Environment.getExternalStorageDirectory();
+      StatFs stat = new StatFs(path.getPath());
+      long blockSize = stat.getBlockSizeLong();
+      long availableBlocks = stat.getAvailableBlocksLong();
+      return formatSize(availableBlocks * blockSize);
+    } else {
+      return ERROR;
+    }
+  }
+
+  public static String getTotalInternalMemorySize() {
+    File path = Environment.getDataDirectory();
+    StatFs stat = new StatFs(path.getPath());
+    long blockSize = stat.getBlockSizeLong();
+    long totalBlocks = stat.getBlockCountLong();
+    return formatSize(totalBlocks * blockSize);
+  }
+
+  public static String getAvailableInternalMemorySize() {
+    File path = Environment.getDataDirectory();
+    StatFs stat = new StatFs(path.getPath());
+    long blockSize = stat.getBlockSizeLong();
+    long availableBlocks = stat.getAvailableBlocksLong();
+    return formatSize(availableBlocks * blockSize);
+  }
+
+
+  public static String formatSize(long size) {
+    String suffix = null;
+
+    if (size >= 1024) {
+      suffix = " KB";
+      size /= 1024;
+      if (size >= 1024) {
+        suffix = " MB";
+        size /= 1024;
+      }
+    }
+
+    StringBuilder resultBuffer = new StringBuilder(Long.toString(size));
+
+    int commaOffset = resultBuffer.length() - 3;
+    while (commaOffset > 0) {
+      resultBuffer.insert(commaOffset, ',');
+      commaOffset -= 3;
+    }
+
+    if (suffix != null) {
+      resultBuffer.append(suffix);
+    }
+    return resultBuffer.toString();
+  }
+
+  //-------------------------------------To convert long to bytes ----------------------------------------------------------------
+  public static String humanReadableByteCount(long bytes, boolean si) {
+    int unit = si ? 1000 : 1024;
+    if (bytes < unit) {
+      return bytes + " B";
+    }
+    int exp = (int) (Math.log(bytes) / Math.log(unit));
+    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+  }
+//------------------------------------------------------------------------------------------------------------------------------------
+
+  public long avilableRAM(){
+    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+    ActivityManager activityManager = (ActivityManager) (getContext()).getSystemService(ACTIVITY_SERVICE);
+    activityManager.getMemoryInfo(mi);
+    long availableMegs = mi.availMem / 0x100000L;
+    return availableMegs;
+  }
+
+
+    public long totalRAM(){
     long totalMemory;
       ActivityManager actManager = (ActivityManager) ((Activity) getContext()).getSystemService(ACTIVITY_SERVICE);
       ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
@@ -77,7 +185,7 @@ public class Menu3 extends Fragment {
     display.getSize(size);
     int width = size.x;
     int height = size.y;
-    screenResolutionTextView.setText("Screen Resolution: "+String.valueOf(width)+"*"+String.valueOf(height)+" pixels");
+    screenResolutionTextView.setText("Resolution: "+String.valueOf(width)+"*"+String.valueOf(height)+" pixels");
   }
 
   //----------------------------- To get screen size in inches --------------------------------------------------------

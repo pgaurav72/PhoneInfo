@@ -1,6 +1,23 @@
 package com.gaurav.phoneinfo;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
+import android.opengl.GLES10;
+import android.opengl.GLES20;
 import android.os.Build;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,8 +27,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.regex.Pattern;
+
+import javax.microedition.khronos.opengles.GL10;
+
+import static android.opengl.GLES10.glGetString;
 
 
 /**
@@ -19,7 +43,7 @@ import java.io.RandomAccessFile;
  */
 public class Menu2 extends Fragment {
 
-  private TextView availableProcessorTextView, archTextView, cpuFrquencyTextView;
+  private TextView availableProcessorTextView, archTextView, gpuVenderTextView, gpuRenderTextView, gpuVersionTextView, gpuExtensionTextView;
 
 
   @Nullable
@@ -29,31 +53,38 @@ public class Menu2 extends Fragment {
 
     availableProcessorTextView = view.findViewById(R.id.avil_pro_text_view);
     archTextView = view.findViewById(R.id.architecture_text_view);
-    cpuFrquencyTextView = view.findViewById(R.id.cpufreq_text_view);
+    gpuVenderTextView = view.findViewById(R.id.gpu_vender_text_view);
+    gpuRenderTextView = view.findViewById(R.id.gpu_render_text_view);
+    gpuVersionTextView = view.findViewById(R.id.gpu_version_text_view);
+    gpuExtensionTextView = view.findViewById(R.id.gpu_extension_text_view);
     availableProcessorTextView.setText("Cores: "+String.valueOf(Runtime.getRuntime().availableProcessors()));
     archTextView.setText("Architecture: "+System.getProperty("os.arch"));
-    cpuFrequecy();
+    GPUInfo();
+
 
     //returning our layout file
     //change R.layout.yourlayoutfilename for each of your fragments
     return view;
   }
 
-  public void cpuFrequecy(){
-    //------------------------------------------ CPU Frequency ---------------------------------
-    try {
-
-      String cpuMaxFreq = "";
-      RandomAccessFile reader = new RandomAccessFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r");
-      cpuMaxFreq = reader.readLine();
-      cpuFrquencyTextView.setText("Clock speed" + cpuMaxFreq);
-      reader.close();
-
-    }catch (Exception e){
-      e.printStackTrace();
-    }
-    //-------------------------------------------------------------------------------------------------
+  //------------------------------------------------------- GPU INFORMATION -----------------------------
+  public void GPUInfo(){
+    gpuVenderTextView.setText("GPU Vender: "+GLES10.glGetString( GLES10.GL_RENDERER));
+    gpuRenderTextView.setText("GPU Render: "+GLES10.glGetString( GLES10.GL_VENDOR));
+    gpuVersionTextView.setText("GPU Version: "+getGlVersion(getContext()));
+    gpuExtensionTextView.setText("GPU Extension: "+ GLES10.glGetString(GLES10.GL_EXTENSIONS));
   }
+
+  public static String getGlVersion(Context ctx) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+      ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+      ConfigurationInfo configurationInfo = am.getDeviceConfigurationInfo();
+      return configurationInfo.getGlEsVersion();
+    } else {
+      return GLES10.glGetString(GLES10.GL_VERSION);
+    }
+  }
+//-------------------------------------------------------------------------------------------------
 
 
   @Override
